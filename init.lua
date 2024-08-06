@@ -54,12 +54,15 @@ vim.opt.splitbelow = true
 --  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = "  ", trail = "·", nbsp = " " }
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 2
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = "split"
 
 -- Show which line your cursor is on
 vim.opt.cursorline = true
+vim.opt.termguicolors = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
@@ -143,7 +146,6 @@ require("lazy").setup({
 	--
 	-- Use `opts = {}` to force a plugin to be loaded.
 	--
-
 	-- Here is a more advanced example where we pass configuration
 	-- options to `gitsigns.nvim`. This is equivalent to the following Lua:
 	--    require('gitsigns').setup({ ... })
@@ -161,7 +163,12 @@ require("lazy").setup({
 			},
 		},
 	},
-
+	{
+		"numToStr/Comment.nvim",
+		config = function()
+			require("Comment").setup()
+		end,
+	},
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.
 	--
 	-- This is often very useful to both group configuration, as well as handle
@@ -597,12 +604,14 @@ require("lazy").setup({
 					-- `friendly-snippets` contains a variety of premade snippets.
 					--    See the README about individual language/framework/plugin snippets:
 					--    https://github.com/rafamadriz/friendly-snippets
-					-- {
-					--   'rafamadriz/friendly-snippets',
-					--   config = function()
-					--     require('luasnip.loaders.from_vscode').lazy_load()
-					--   end,
-					-- },
+					{
+						"rafamadriz/friendly-snippets",
+						config = function()
+							local ls = require("luasnip")
+							require("luasnip.loaders.from_vscode").lazy_load()
+							ls.snippets = {}
+						end,
+					},
 				},
 			},
 			"saadparwaiz1/cmp_luasnip",
@@ -617,7 +626,19 @@ require("lazy").setup({
 			-- See `:help cmp`
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
-			luasnip.config.setup({})
+			-- local s = luasnip.snippet
+			-- local t = luasnip.text_node
+			-- local i = luasnip.insert_node
+			-- luasnip.config.setup({})
+			-- luasnip.add_snippets("c", {
+			-- 	s("while loop", {
+			-- 		t("while ("),
+			-- 		i(1, "expr"),
+			-- 		t(")\n{\n"),
+			-- 		i(2, "code"),
+			-- 		t("\n}"),
+			-- 	}),
+			-- })
 
 			cmp.setup({
 				snippet = {
@@ -644,8 +665,7 @@ require("lazy").setup({
 					-- Accept ([y]es) the completion.
 					--  This will auto-import if your LSP supports it.
 					--  This will expand snippets if the LSP sent a snippet.
-					["<Tab>"] = cmp.mapping.confirm({ select = true }),
-
+					["<S-Tab>"] = cmp.mapping.confirm({ select = true }),
 					-- If you prefer more traditional completion keymaps,
 					-- you can uncomment the following lines
 					--['<CR>'] = cmp.mapping.confirm { select = true },
@@ -665,12 +685,12 @@ require("lazy").setup({
 					--
 					-- <c-l> will move you to the right of each of the expansion locations.
 					-- <c-h> is similar, except moving you backwards.
-					["<C-l>"] = cmp.mapping(function()
+					["<A-n>"] = cmp.mapping(function()
 						if luasnip.expand_or_locally_jumpable() then
 							luasnip.expand_or_jump()
 						end
 					end, { "i", "s" }),
-					["<C-h>"] = cmp.mapping(function()
+					["<A-b>"] = cmp.mapping(function()
 						if luasnip.locally_jumpable(-1) then
 							luasnip.jump(-1)
 						end
@@ -711,7 +731,6 @@ require("lazy").setup({
 				-- Change the "hint" color to the "orange" color, and make the "error" color bright red
 				on_colors = function(colors)
 					colors.bg = "#02050C"
-					colors.error = "#ff0000"
 				end,
 			})
 		end,
@@ -860,3 +879,4 @@ require("lazy").setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
